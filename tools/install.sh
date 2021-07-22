@@ -41,8 +41,7 @@ set -e
 custom_zsh=${ZSH:+yes}
 
 # Default settings
-#ZSH=${ZSH:-~/.oh-my-zsh}
-ZSH=${ZSH:-/$(whoami)/.oh-my-zsh}
+ZSH=${ZSH:-~/.oh-my-zsh}
 REPO=${REPO:-ohmyzsh/ohmyzsh}
 REMOTE=${REMOTE:-https://github.com/${REPO}.git}
 BRANCH=${BRANCH:-master}
@@ -51,9 +50,6 @@ BRANCH=${BRANCH:-master}
 CHSH=${CHSH:-yes}
 RUNZSH=${RUNZSH:-yes}
 KEEP_ZSHRC=${KEEP_ZSHRC:-no}
-
-sudo rm -rf /$(whoami)/.zshrc*
-sudo rm -rf /$(whoami)/.oh-my-zsh
 
 
 command_exists() {
@@ -133,11 +129,11 @@ setup_zshrc() {
   echo "${BLUE}Looking for an existing zsh config...${RESET}"
 
   # Must use this exact name so uninstall.sh can find it
-  OLD_ZSHRC=/$(whoami)/.zshrc.pre-oh-my-zsh
-  if [ -f /$(whoami)/.zshrc ] || [ -h /$(whoami)/.zshrc ]; then
+  OLD_ZSHRC=~/.zshrc.pre-oh-my-zsh
+  if [ -f ~/.zshrc ] || [ -h ~/.zshrc ]; then
     # Skip this if the user doesn't want to replace an existing .zshrc
     if [ "$KEEP_ZSHRC" = yes ]; then
-      echo "${YELLOW}Found /$(whoami)/.zshrc.${RESET} ${GREEN}Keeping...${RESET}"
+      echo "${YELLOW}Found ~/.zshrc.${RESET} ${GREEN}Keeping...${RESET}"
       return
     fi
     if [ -e "$OLD_ZSHRC" ]; then
@@ -149,19 +145,19 @@ setup_zshrc() {
       fi
       mv "$OLD_ZSHRC" "${OLD_OLD_ZSHRC}"
 
-      echo "${YELLOW}Found old /$(whoami)/.zshrc.pre-oh-my-zsh." \
+      echo "${YELLOW}Found old ~/.zshrc.pre-oh-my-zsh." \
         "${GREEN}Backing up to ${OLD_OLD_ZSHRC}${RESET}"
     fi
-    echo "${YELLOW}Found /$(whoami)/.zshrc.${RESET} ${GREEN}Backing up to ${OLD_ZSHRC}${RESET}"
-    mv /$(whoami)/.zshrc "$OLD_ZSHRC"
+    echo "${YELLOW}Found ~/.zshrc.${RESET} ${GREEN}Backing up to ${OLD_ZSHRC}${RESET}"
+    mv ~/.zshrc "$OLD_ZSHRC"
   fi
 
-  echo "${GREEN}Using the Oh My Zsh template file and adding it to /$(whoami)/.zshrc.${RESET}"
+  echo "${GREEN}Using the Oh My Zsh template file and adding it to ~/.zshrc.${RESET}"
 
   sed "/^export ZSH=/ c\\
 export ZSH=\"$ZSH\"
-" "$ZSH/templates/zshrc.zsh-template" > /$(whoami)/.zshrc-omztemp
-	mv -f /$(whoami)/.zshrc-omztemp ~/.zshrc
+" "$ZSH/templates/zshrc.zsh-template" > ~/.zshrc-omztemp
+	mv -f ~/.zshrc-omztemp ~/.zshrc
 
 	echo
 }
@@ -229,9 +225,9 @@ EOF
 
   # We're going to change the default shell, so back up the current one
   if [ -n "$SHELL" ]; then
-    echo "$SHELL" > /$(whoami)/.shell.pre-oh-my-zsh
+    echo "$SHELL" > ~/.shell.pre-oh-my-zsh
   else
-    grep "^$USERNAME:" /etc/passwd | awk -F: '{print $7}' > /$(whoami)/.shell.pre-oh-my-zsh
+    grep "^$USERNAME:" /etc/passwd | awk -F: '{print $7}' > ~/.shell.pre-oh-my-zsh
   fi
 
   # Actually change the default shell to zsh
@@ -247,7 +243,6 @@ EOF
 
 main() {
   # Run as unattended if stdin is not a tty
-  
   if [ ! -t 0 ]; then
     RUNZSH=no
     CHSH=no
@@ -274,17 +269,14 @@ main() {
     echo "${YELLOW}The \$ZSH folder already exists ($ZSH).${RESET}"
     if [ "$custom_zsh" = yes ]; then
       cat <<EOF
-
 You ran the installer with the \$ZSH setting or the \$ZSH variable is
 exported. You have 3 options:
-
 1. Unset the ZSH variable when calling the installer:
    $(fmt_code "ZSH= sh install.sh")
 2. Install Oh My Zsh to a directory that doesn't exist yet:
    $(fmt_code "ZSH=path/to/new/ohmyzsh/folder sh install.sh")
 3. (Caution) If the folder doesn't contain important information,
    you can just remove it with $(fmt_code "rm -r $ZSH")
-
 EOF
     else
       echo "You'll need to remove it if you want to reinstall."
@@ -304,16 +296,12 @@ EOF
 / /_/ / / / /  / / / / / / /_/ /    / /_(__  ) / / /
 \____/_/ /_/  /_/ /_/ /_/\__, /    /___/____/_/ /_/
                         /____/                       ....is now installed!
-
-
 EOF
   cat <<EOF
 Before you scream Oh My Zsh! please look over the ~/.zshrc file to select plugins, themes, and options.
-
 • Follow us on Twitter: $(fmt_underline https://twitter.com/ohmyzsh)
 • Join our Discord server: $(fmt_underline https://discord.gg/ohmyzsh)
 • Get stickers, shirts, coffee mugs and other swag: $(fmt_underline https://shop.planetargon.com/collections/oh-my-zsh)
-
 EOF
   printf %s "$RESET"
 
@@ -329,8 +317,10 @@ EOF
   #sudo sed -i 's/ZSH_THEME="ys"/ZSH_THEME="powerlevel10k\/powerlevel10k"/g' ~/.zshrc
   #sudo sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting pip)/g' ~/.zshrc
   #ln -s -f ~/oh-my-system/.dot_files/linux/.zshrc ~/.zshrc
-
   #exec zsh -l
 }
 
 main "$@"
+  
+
+
