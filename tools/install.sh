@@ -41,7 +41,8 @@ set -e
 custom_zsh=${ZSH:+yes}
 
 # Default settings
-ZSH=${ZSH:-~/.oh-my-zsh}
+#ZSH=${ZSH:-~/.oh-my-zsh}
+ZSH=${ZSH:-/$(whoami)/.oh-my-zsh}
 REPO=${REPO:-ohmyzsh/ohmyzsh}
 REMOTE=${REMOTE:-https://github.com/${REPO}.git}
 BRANCH=${BRANCH:-master}
@@ -50,6 +51,9 @@ BRANCH=${BRANCH:-master}
 CHSH=${CHSH:-yes}
 RUNZSH=${RUNZSH:-yes}
 KEEP_ZSHRC=${KEEP_ZSHRC:-no}
+
+sudo rm -rf /$(whoami)/.zshrc*
+sudo rm -rf /$(whoami)/.oh-my-zsh
 
 
 command_exists() {
@@ -129,11 +133,11 @@ setup_zshrc() {
   echo "${BLUE}Looking for an existing zsh config...${RESET}"
 
   # Must use this exact name so uninstall.sh can find it
-  OLD_ZSHRC=~/.zshrc.pre-oh-my-zsh
-  if [ -f ~/.zshrc ] || [ -h ~/.zshrc ]; then
+  OLD_ZSHRC=/$(whoami)/.zshrc.pre-oh-my-zsh
+  if [ -f /$(whoami)/.zshrc ] || [ -h /$(whoami)/.zshrc ]; then
     # Skip this if the user doesn't want to replace an existing .zshrc
     if [ "$KEEP_ZSHRC" = yes ]; then
-      echo "${YELLOW}Found ~/.zshrc.${RESET} ${GREEN}Keeping...${RESET}"
+      echo "${YELLOW}Found /$(whoami)/.zshrc.${RESET} ${GREEN}Keeping...${RESET}"
       return
     fi
     if [ -e "$OLD_ZSHRC" ]; then
@@ -145,19 +149,19 @@ setup_zshrc() {
       fi
       mv "$OLD_ZSHRC" "${OLD_OLD_ZSHRC}"
 
-      echo "${YELLOW}Found old ~/.zshrc.pre-oh-my-zsh." \
+      echo "${YELLOW}Found old /$(whoami)/.zshrc.pre-oh-my-zsh." \
         "${GREEN}Backing up to ${OLD_OLD_ZSHRC}${RESET}"
     fi
-    echo "${YELLOW}Found ~/.zshrc.${RESET} ${GREEN}Backing up to ${OLD_ZSHRC}${RESET}"
-    mv ~/.zshrc "$OLD_ZSHRC"
+    echo "${YELLOW}Found /$(whoami)/.zshrc.${RESET} ${GREEN}Backing up to ${OLD_ZSHRC}${RESET}"
+    mv /$(whoami)/.zshrc "$OLD_ZSHRC"
   fi
 
-  echo "${GREEN}Using the Oh My Zsh template file and adding it to ~/.zshrc.${RESET}"
+  echo "${GREEN}Using the Oh My Zsh template file and adding it to /$(whoami)/.zshrc.${RESET}"
 
   sed "/^export ZSH=/ c\\
 export ZSH=\"$ZSH\"
-" "$ZSH/templates/zshrc.zsh-template" > ~/.zshrc-omztemp
-	mv -f ~/.zshrc-omztemp ~/.zshrc
+" "$ZSH/templates/zshrc.zsh-template" > /$(whoami)/.zshrc-omztemp
+	mv -f /$(whoami)/.zshrc-omztemp ~/.zshrc
 
 	echo
 }
@@ -225,9 +229,9 @@ EOF
 
   # We're going to change the default shell, so back up the current one
   if [ -n "$SHELL" ]; then
-    echo "$SHELL" > ~/.shell.pre-oh-my-zsh
+    echo "$SHELL" > /$(whoami)/.shell.pre-oh-my-zsh
   else
-    grep "^$USERNAME:" /etc/passwd | awk -F: '{print $7}' > ~/.shell.pre-oh-my-zsh
+    grep "^$USERNAME:" /etc/passwd | awk -F: '{print $7}' > /$(whoami)/.shell.pre-oh-my-zsh
   fi
 
   # Actually change the default shell to zsh
@@ -243,6 +247,7 @@ EOF
 
 main() {
   # Run as unattended if stdin is not a tty
+  
   if [ ! -t 0 ]; then
     RUNZSH=no
     CHSH=no
@@ -316,8 +321,16 @@ EOF
     echo "${YELLOW}Run zsh to try it out.${RESET}"
     exit
   fi
+  #ZSH= sh -c "$(wget -O- https://gitee.com/kingscat/ohmyzsh/raw/master/tools/install.sh)" 
+  git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+  git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+  #sudo cp ~/.zshrc ~/.zshrc.bak
+  #sudo sed -i 's/ZSH_THEME="ys"/ZSH_THEME="powerlevel10k\/powerlevel10k"/g' ~/.zshrc
+  #sudo sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting pip)/g' ~/.zshrc
+  ln -s -f ~/oh-my-system/.dot_files/linux/.zshrc ~/.zshrc
 
-  exec zsh -l
+  #exec zsh -l
 }
 
 main "$@"
