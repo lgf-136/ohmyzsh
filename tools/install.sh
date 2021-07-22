@@ -328,7 +328,7 @@ EOF
   #sudo cp ~/.zshrc ~/.zshrc.bak
   #sudo sed -i 's/ZSH_THEME="ys"/ZSH_THEME="powerlevel10k\/powerlevel10k"/g' ~/.zshrc
   #sudo sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting pip)/g' ~/.zshrc
-  ln -s -f ~/oh-my-system/.dot_files/linux/.zshrc ~/.zshrc
+  #ln -s -f ~/oh-my-system/.dot_files/linux/.zshrc ~/.zshrc
 
   #exec zsh -l
 }
